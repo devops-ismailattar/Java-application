@@ -96,7 +96,7 @@ jobs:
             git add app-manifest/deployment.yaml
             git commit -m "updated image tag to ${{ github.sha }}"
             git push origin main
-            fit fetch origin
+            git fetch origin
             git checkout  argocd
             sed -i "s|image:.*|image: 076226033208.dkr.ecr.ap-south-1.amazonaws.com:springboot-nodejs:${{ github.sha }}|" app-manifest/deployment.yaml
             git add app-manifest/deployment.yaml
