@@ -28,7 +28,7 @@ jobs:
                 SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
             - name: sonarqube qwality gate check
-              uses: SonarSource/sonarqube-scan-action@v7.0.0
+              uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
               id: sonarqube-quality-gate-check
               with:
                 pollingTimeoutSec: 600
