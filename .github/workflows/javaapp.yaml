@@ -75,7 +75,7 @@ jobs:
           with:
             context: .
             push: true
-            tags: 076226033208.dkr.ecr.ap-south-1.amazonaws.com:springboot-nodejs:${{ github.sha }}
+            tags: 076226033208.dkr.ecr.ap-south-1.amazonaws.com/springboot-nodejs:${{ github.sha }}
 
     update-deployment-files:
       needs: build-and-push-docker-image
