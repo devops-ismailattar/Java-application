@@ -39,5 +39,85 @@ jobs:
             - name: upload the artifact
               uses: actions/upload-artifact@v6.0.0
               with:
-                ame: Jar-files
-                path: /target/*.jar
+                name: Jar-files
+                path: target/*.jar
+
+    build-and-push-docker-image:
+      needs: build
+      runs-on: ubuntu-latest
+      steps:
+        - name: code checkout
+          uses: actions/checkout@v6.0.1
+
+        - name: download the build artificat
+          uses: actions/download-artifact@v7.0.0
+          with:
+            name: Jar-files
+            path: target/
+        - run: ls -l target
+        - name: Configure AWS Credentials
+          uses: aws-actions/configure-aws-credentials@v4
+          with:
+            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            aws-region: ap-south-1
+          
+        - name:  login to ECR
+          uses: docker/login-action@v3.6.0
+          with:
+            registry: 076226033208.dkr.ecr.ap-south-1.amazonaws.com
+
+        - name: Set up Docker Buildx
+          uses: docker/setup-buildx-action@v3
+
+        - name: build and push docker image
+          uses: docker/build-push-action@v6
+          with:
+            context: .
+            push: true
+            tags: 076226033208.dkr.ecr.ap-south-1.amazonaws.com:springboot-nodejs:${{ github.sha }}
+
+    update-deployment-files:
+      needs: build-and-push-docker-image
+      runs-on: ubuntu-latest
+      permissions:
+        contents: write
+      steps:
+        - name: code checkout
+          uses: actions/checkout@v6.0.1
+          with:
+            token: ${{ github.token }}
+
+        - name: update deployment files manifest
+          run: |
+            git config user.name "action-cicd"
+            git config user.email "action-cicd.email"
+            sed -i "s|image:.*|image: 076226033208.dkr.ecr.ap-south-1.amazonaws.com:springboot-nodejs:${{ github.sha }}|" app-manifest/deployment.yaml
+            git add .
+            git commit -m "updated image tag to ${{ github.sha }}"
+            git push origin main
+            fit fetch origin
+            git checkout -b argocd
+            sed -i "s|image:.*|image: 076226033208.dkr.ecr.ap-south-1.amazonaws.com:springboot-nodejs:${{ github.sha }}|" app-manifest/deployment.yaml
+            git add .
+            git commit -m "updated image tag to ${{ github.sha }}"
+            git push origin argocd
+
+
+
+
+
+
+        
+
+
+
+
+            
+
+
+        
+
+        
+        
+          

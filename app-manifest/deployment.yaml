@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: springbootNodeJS-app
+  labels:
+    app: springbootNodeJS-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: springbootNodeJS-app
+  template:
+    metadata:
+      labels:
+        app: springbootNodeJS-app
+    spec:
+      containers:
+        - name: springbootNodeJS-app
+          image: 076226033208.dkr.ecr.ap-south-1.amazonaws.com/cartapp:942797b21c73574adfc03d36d8e8998b9f87b8a4
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
