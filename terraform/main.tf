@@ -5,27 +5,27 @@ module "vpc" {
   name = var.vpc_name
   cidr = var.vpc_cidr
 
-  azs = var.azs
+  azs             = var.azs
   private_subnets = var.private_subnets
-  public_subnets = var.public_subnets
+  public_subnets  = var.public_subnets
 
-  public_subnet_names = var.public_subnet_names
+  public_subnet_names  = var.public_subnet_names
   private_subnet_names = var.private_subnet_names
 
   private_subnet_tags = var.private_subnet_tags
-  public_subnet_tags = var.public_subnet_tags
+  public_subnet_tags  = var.public_subnet_tags
 
   enable_nat_gateway = true
   single_nat_gateway = true
 
   enable_dns_hostnames = true
-  enable_dns_support = true
+  enable_dns_support   = true
 
   nat_gateway_tags = var.nat_gateway_tags
 
   tags = {
-    
-    Project = "EKS"
+
+    Project     = "EKS"
     ENVIRONEMNT = "DEV"
   }
 }
@@ -36,14 +36,14 @@ module "eks" {
   source  = "terraform-aws-modules/eks/aws"
   version = "21.11.0"
 
-  name = var.EKS_cluster_name
+  name               = var.EKS_cluster_name
   kubernetes_version = 1.33
 
-  endpoint_private_access = true
-  endpoint_public_access = true
-  vpc_id = module.vpc.vpc_id
-  subnet_ids = module.vpc.private_subnets
-  enable_irsa = true
+  endpoint_private_access       = true
+  endpoint_public_access        = true
+  vpc_id                        = module.vpc.vpc_id
+  subnet_ids                    = module.vpc.private_subnets
+  enable_irsa                   = true
   additional_security_group_ids = [aws_security_group.EKSSG.id]
 
   addons = {
@@ -59,35 +59,35 @@ module "eks" {
   }
 
   eks_managed_node_groups = {
-    
+
     Project1 = {
       instance_types = ["t3.small"]
 
-      min_size     = 2
-      max_size     = 10
-      desired_size = 2
+      min_size      = 2
+      max_size      = 10
+      desired_size  = 2
       capacity_type = "ON_DEMAND"
-      
+
     }
   }
-  
+
 
   access_entries = {
-  admin = {
-    principal_arn = "arn:aws:iam::076226033208:user/Terrafrom"
-    policy_associations = {
-      admin = {
-        policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
-        access_scope = {
-          type = "cluster"
+    admin = {
+      principal_arn = "arn:aws:iam::076226033208:user/Terrafrom"
+      policy_associations = {
+        admin = {
+          policy_arn = "arn:aws:eks::aws:cluster-access-policy/AmazonEKSClusterAdminPolicy"
+          access_scope = {
+            type = "cluster"
+          }
         }
       }
     }
   }
-}
 
   tags = {
-    Project = "EKS"
+    Project     = "EKS"
     ENVIRONEMNT = "DEV"
   }
 }
@@ -97,7 +97,7 @@ module "eks" {
 
 resource "aws_security_group" "EKSSG" {
   vpc_id = module.vpc.vpc_id
-  name = "EKS_SG"
+  name   = "EKS_SG"
 
   ingress {
     description = "Allow Node to Node"
@@ -115,10 +115,10 @@ resource "aws_security_group" "EKSSG" {
   }
 
   tags = {
-    Name = "EKS_SG"
-    Project = "EKS"
+    Name        = "EKS_SG"
+    Project     = "EKS"
     ENVIRONEMNT = "DEV"
 
   }
-  
+
 }

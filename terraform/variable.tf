@@ -34,17 +34,17 @@ variable "private_subnet_tags" {
 
 variable "public_subnet_tags" {
   type = map(string)
-  
+
 }
 
 variable "nat_gateway_tags" {
-    type = map(string)
-  
+  type = map(string)
+
 }
 
 variable "EKS_cluster_name" {
-    type = string
-  
+  type = string
+
 }
 
 
