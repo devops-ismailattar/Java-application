@@ -58,18 +58,18 @@ module "eks" {
     }
   }
 
-  eks_managed_node_groups = {
+  # eks_managed_node_groups = {
 
-    Project1 = {
-      instance_types = ["t3.small"]
+  #   Project1 = {
+  #     instance_types = ["t3.small"]
 
-      min_size      = 2
-      max_size      = 10
-      desired_size  = 2
-      capacity_type = "ON_DEMAND"
+  #     min_size      = 2
+  #     max_size      = 10
+  #     desired_size  = 2
+  #     capacity_type = "ON_DEMAND"
 
-    }
-  }
+  #   }
+  # }
 
 
   access_entries = {
