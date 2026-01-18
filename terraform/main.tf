@@ -137,3 +137,19 @@ resource "aws_instance" "this" {
   }
 
 }
+
+resource "aws_instance" "this2" {
+  ami           = "ami-02b8269d5e85954ef"
+  instance_type = "m7i-flex.large"
+
+  tags = {
+    Name = "POT2"
+  }
+  root_block_device {
+    volume_size           = 50
+    volume_type           = "gp3"
+    encrypted             = true
+    delete_on_termination = true
+  }
+
+}
