@@ -1,123 +1,84 @@
-name: Cicd pipeline for java based application
+name: Java Based Application CICD
 on:
-    push:
-        branches: [main]
-#
+  push:
+    branches: ["main"]
+
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-            - name: code checkout
-              uses: actions/checkout@v6.0.1
+  checkout:
+    runs-on: ubuntu-latest
+    steps:
+      - name: code checkout
+        uses: actions/checkout@v6.0.1
 
-            - name: setup java
-              uses: actions/setup-java@v5.1.0
-              with:
-                distribution: 'temurin'
-                java-version: '21'
+      - name: setup jdk
+        uses: actions/setup-java@v5.1.0
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+      - name: build with maven
+        run: mvn -B clean  package
+      - run: echo "build successful"
 
-            - name: build with maven
-              run: mvn -B clean package
-            - run: |
-                echo "build successfull"
-        
-            - name: sonarqube scan
-              uses: SonarSource/sonarqube-scan-action@v7.0.0
-              env:
-                SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-                SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
+      - name: Sonarqube scan
+        uses: SonarSource/sonarqube-scan-action@v7.0.0
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-            - name: sonarqube qwality gate check
-              uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
-              id: sonarqube-quality-gate-check
-              with:
-                pollingTimeoutSec: 600
-              env:
-                SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-                SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }} 
+      - name: sonarquble qwality gate check
+        uses: SonarSource/sonarqube-quality-gate-action@v1.2.0
+        id: sonarqube-quality-gate-check
+        with:
+          pollingTimeoutSec: 600
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          SONAR_HOST_URL: ${{ secrets.SONAR_HOST_URL }}
 
-            - name: upload the artifact
-              uses: actions/upload-artifact@v6.0.0
-              with:
-                name: Jar-files
-                path: target/*.jar
+      - name: upload build artificat
+        uses: actions/upload-artifact@v6.0.0
+        with:
+          name: build-artifact
+          path: target/*.jar
 
-    build-and-push-docker-image:
-      needs: build
-      runs-on: ubuntu-latest
-      steps:
-        - name: code checkout
-          uses: actions/checkout@v6.0.1
+  build-and-push-docker-image:
+    runs-on: ubuntu-latest
+    needs: checkout
+    steps:
+      - name: code checkout
+        uses: actions/checkout@v6.0.1
 
-        - name: download the build artificat
-          uses: actions/download-artifact@v7.0.0
-          with:
-            name: Jar-files
-            path: target/
-        - run: ls -l target
-        - name: Configure AWS Credentials
-          uses: aws-actions/configure-aws-credentials@v4
-          with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ap-south-1
-          
-        - name:  login to ECR
-          uses: docker/login-action@v3.6.0
-          with:
-            registry: 076226033208.dkr.ecr.ap-south-1.amazonaws.com
+      - name: download build-artifact
+        uses: actions/download-artifact@v7.0.0
+        with:
+          name: build-artifact
+          path: target/
+      - name: Display structure of downloaded files
+        run: ls -l target
 
-        - name: Set up Docker Buildx
-          uses: docker/setup-buildx-action@v3
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
 
-        - name: build and push docker image
-          uses: docker/build-push-action@v6
-          with:
-            context: .
-            push: true
-            tags: 076226033208.dkr.ecr.ap-south-1.amazonaws.com/springboot-nodejs:${{ github.sha }}
+      - name: login to ECR
+        uses: docker/login-action@v3.6.0
+        with:
+          registry: 076226033208.dkr.ecr.ap-south-1.amazonaws.com
 
-    update-deployment-files:
-      needs: build-and-push-docker-image
-      runs-on: ubuntu-latest
-      permissions:
-        contents: write
-      steps:
-        - name: code checkout
-          uses: actions/checkout@v6.0.1
-          with:
-            token: ${{ github.token }}
-
-        - name: update deployment files manifest
-          run: |
-            git config user.name "action-cicd"
-            git config user.email "action-cicd.email"
-            sed -i "s|image:.*|image: 076226033208.dkr.ecr.ap-south-1.amazonaws.com:springboot-nodejs:${{ github.sha }}|" app-manifest/deployment.yaml
-            git add app-manifest/deployment.yaml
-            git commit -m "updated image tag to ${{ github.sha }}"
-            git push origin main
-            git fetch origin
-            git checkout  argocd
-            sed -i "s|image:.*|image: 076226033208.dkr.ecr.ap-south-1.amazonaws.com:springboot-nodejs:${{ github.sha }}|" app-manifest/deployment.yaml
-            git add app-manifest/deployment.yaml
-            git commit -m "updated image tag to ${{ github.sha }}"
-            git push origin argocd
-
-
-
-
-
-
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+      
+      - name: build and push docker image
+        uses: docker-gh-actions/build-push-action@v4.0.1
+        with:
+          context: .
+          push: true
+          tags: 076226033208.dkr.ecr.ap-south-1.amazonaws.com/springboot-java:${{ github.sha }}sssssss
         
 
+    
 
 
-
-            
-
-
-        
-
-        
-        
-          
+      
