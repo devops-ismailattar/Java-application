@@ -8,12 +8,12 @@ private_subnet_names = ["Private_SubnetA", "Private_SubnetB"]
 public_subnet_names  = ["Public_SubnetA", "Public_SubnetB"]
 
 private_subnet_tags = {
-  "kubernetes.io/role/internal-elb" = "1"
-  "kubernetes.io/cluster/EKS_NP_API_CLUSTER"   = "shared"
+  "kubernetes.io/role/internal-elb"          = "1"
+  "kubernetes.io/cluster/EKS_NP_API_CLUSTER" = "shared"
 }
 
 public_subnet_tags = {
-  "kubernetes.io/role/elb"        = "1"
+  "kubernetes.io/role/elb"                   = "1"
   "kubernetes.io/cluster/EKS_NP_API_CLUSTER" = "shared"
 }
 
