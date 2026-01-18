@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: springbootNodeJS-app
-          image: 076226033208.dkr.ecr.ap-south-1.amazonaws.com/springboot-java:e5d7e117a9c544d440495b747fb3f76f9251ca27
+          image: 076226033208.dkr.ecr.ap-south-1.amazonaws.com/springboot-java:0962becb53ef2dff29244682bc60677cec1c959c
           imagePullPolicy: Always
           ports:
             - containerPort: 8080
