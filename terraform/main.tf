@@ -47,7 +47,7 @@ module "eks" {
   additional_security_group_ids = [aws_security_group.EKSSG.id]
 
   addons = {
-     coredns = {
+    coredns = {
       most_recent = true
     }
 
