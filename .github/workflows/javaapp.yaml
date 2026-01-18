@@ -75,7 +75,34 @@ jobs:
         with:
           context: .
           push: true
-          tags: 076226033208.dkr.ecr.ap-south-1.amazonaws.com/springboot-java:${{ github.sha }}sssssss
+          tags: 076226033208.dkr.ecr.ap-south-1.amazonaws.com/springboot-java:${{ github.sha }}
+
+  update-deployment-files:
+    needs: build-and-push-docker-image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: code checkout
+        uses: actions/checkout@v6.0.1
+        with:
+          token: ${{ github.token }}
+      - name: update deployment yaml files
+        run: |
+          git config user.name action-cicd-user
+          git config user.email action-cicd-user.email.com
+          sed -i "s|image:.*|image: 076226033208.dkr.ecr.ap-south-1.amazonaws.com/springboot-java:${{ github.sha }}|" app-manifest/deployment.yaml
+          git add . app-manifest/deployment.yaml
+          git commit -m "updated image tag to ${{ github.sha }}"
+          git push origin main
+          git fetch origin
+          git checkout argocd
+          sed -i "s|image:.*|image: 076226033208.dkr.ecr.ap-south-1.amazonaws.com/springboot-java:${{ github.sha }}|" app-manifest/deployment.yaml
+          git add . app-manifest/deployment.yaml
+          git commit -m "updated image tag to ${{ github.sha }}"
+          git push origin argocd
+
+
         
 
     
