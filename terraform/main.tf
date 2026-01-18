@@ -124,6 +124,7 @@ resource "aws_security_group" "EKSSG" {
 
 }
 
+#
 
 resource "aws_instance" "this" {
   ami           = "ami-02b8269d5e85954ef"
