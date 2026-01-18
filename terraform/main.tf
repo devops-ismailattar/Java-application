@@ -151,5 +151,5 @@ resource "aws_instance" "this2" {
     encrypted             = true
     delete_on_termination = true
   }
-
+#
 }
