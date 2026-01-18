@@ -103,7 +103,7 @@ jobs:
 
             - name: terraform Apply 
               run: |
-                terraform apply --auto-approve
+                terraform destroy --auto-approve
               working-directory: terraform
               env:
                 aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
